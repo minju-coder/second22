@@ -55,25 +55,25 @@ st.markdown(
 def parse_decimal(raw_value: str, label: str) -> Decimal:
     value = raw_value.strip()
     if not value:
-        raise ValueError(f"{label}을(를) 입력해 주세요.")
+        raise ValueError(f"{label}을 입력해 주세요.")
     if len(value) > 40:
-        raise ValueError(f"{label}은(는) 40자 이내로 입력해 주세요.")
+        raise ValueError("입력값은 40자 이내로 써 주세요.")
     try:
         number = Decimal(value)
     except InvalidOperation as error:
-        raise ValueError(f"{label}을(를) 숫자로 입력해 주세요.") from error
+        raise ValueError("숫자만 입력해 주세요.") from error
     if not number.is_finite():
-        raise ValueError(f"{label}은(는) 유한한 숫자로 입력해 주세요.")
+        raise ValueError("올바른 숫자를 입력해 주세요.")
     if number.as_tuple().exponent > 12 or number.as_tuple().exponent < -12:
-        raise ValueError(f"{label}은(는) 소수점 이하 12자리 이내로 입력해 주세요.")
+        raise ValueError("소수점 아래 12자리 이내로 입력해 주세요.")
     if number.adjusted() > 12:
-        raise ValueError(f"{label}은(는) 1조보다 작은 수로 입력해 주세요.")
+        raise ValueError("1조보다 작은 수를 입력해 주세요.")
     return number
 
 
 def exact_quotient(dividend: Decimal, divisor: Decimal) -> Fraction:
     if divisor == 0:
-        raise ValueError("0으로 나눌 수 없어요. 나누는 수를 확인해 주세요.")
+        raise ValueError("나누는 수가 0이에요. 0이 아닌 수를 입력해 주세요.")
     return Fraction(dividend) / Fraction(divisor)
 
 
@@ -206,9 +206,9 @@ def tenths_svg() -> str:
         '<svg role="img" aria-label="3.6을 나타내는 십분의 일 모형 36개" '
         'viewBox="0 0 360 170" width="100%" style="max-width:560px;height:auto" '
         'xmlns="http://www.w3.org/2000/svg">'
-        '<text x="15" y="20" font-size="13" fill="#40536a">3.6은 0.1이 36개</text>'
+        '<text x="15" y="20" font-size="13" fill="#40536a">3.6은 0.1이 36개예요</text>'
         f'{"".join(blocks)}'
-        '<text x="15" y="157" font-size="12" fill="#40536a">파란 모형 30개 + 노란 모형 6개</text></svg>'
+        '<text x="15" y="157" font-size="12" fill="#40536a">파란 모형 30개와 노란 모형 6개</text></svg>'
     )
 
 
@@ -259,7 +259,7 @@ def division_process_svg(multiplier: int, dividend: Decimal, divisor: Decimal) -
         'fill="none" stroke="#8378c7" stroke-width="3"/>'
         f'<rect x="505" y="18" width="180" height="86" rx="15" fill="#f3f0ff" stroke="#b3a8df"/>'
         f'<text x="595" y="54" text-anchor="middle" font-size="13">두 수에 ×{multiplier}</text>'
-        '<text x="595" y="81" text-anchor="middle" font-size="13">몫은 그대로!</text></svg>'
+        '<text x="595" y="81" text-anchor="middle" font-size="13">몫은 같아요</text></svg>'
     )
 
 
@@ -293,32 +293,33 @@ def show_activity(
             if dividend < 0 or divisor < 0:
                 raise ValueError("0 이상의 수를 입력해 주세요.")
             if divisor == 0:
-                raise ValueError("0으로 나눌 수 없어요. 나누는 수를 확인해 주세요.")
+                raise ValueError("나누는 수가 0이에요. 0이 아닌 수를 입력해 주세요.")
+
             answer = exact_quotient(dividend, divisor)
 
             if kind == "ribbon":
                 if divisor != divisor.to_integral_value():
-                    st.info("리본을 나눌 사람 수는 자연수로 입력해 주세요.")
+                    st.info("리본을 나눌 사람 수는 1 이상의 자연수로 입력해 주세요.")
                 elif divisor > 60:
-                    st.info("그림으로 나누어 보는 사람 수는 60명까지 입력할 수 있어요.")
+                    st.info("그림은 최대 60명까지 나누어 보여 줄 수 있어요.")
                 else:
                     svg_image(ribbon_svg(dividend, int(divisor)))
                     st.caption(
-                        f"전체 리본 {decimal_text(dividend)}m ÷ {int(divisor)}명 "
-                        f"= 한 사람당 {fraction_text(answer)}m"
+                        f"리본 {decimal_text(dividend)}m를 {int(divisor)}명이 똑같이 나누면 "
+                        f"한 사람은 {fraction_text(answer)}m를 가져요."
                     )
             else:
                 svg_image(juice_svg(dividend, divisor, answer))
                 st.caption(
-                    f"전체 {decimal_text(dividend)}L를 컵마다 "
+                    f"주스 {decimal_text(dividend)}L를 한 컵에 "
                     f"{decimal_text(divisor)}L씩 담아요."
                 )
 
             prediction = st.text_input(
-                answer_label, placeholder="답을 예상해서 숫자로 써 보세요",
+                answer_label, placeholder="먼저 답을 예상해 숫자로 입력해 보세요.",
                 key=f"{key}_answer",
             )
-            if st.button("정답 확인하기", key=f"{key}_check"):
+            if st.button("정답 확인", key=f"{key}_check"):
                 try:
                     entered = parse_decimal(prediction, "예상한 답")
                     correct = Fraction(entered) == answer
@@ -347,7 +348,10 @@ def show_activity(
                 if feedback["correct"] is None:
                     st.warning(feedback["error"])
                 else:
-                    st.success("정답이에요!" if feedback["correct"] else "정답을 확인해 보세요.")
+                    if feedback["correct"]:
+                        st.success("정답이에요! 아래에서 풀이도 확인해 보세요.")
+                    else:
+                        st.info("입력한 답과 정답이 달라요. 아래 풀이를 살펴보세요.")
                     scale_places = max(0, -dividend.normalize().as_tuple().exponent)
                     multiplier = 10 ** scale_places
                     scaled_dividend = dividend * multiplier
@@ -400,19 +404,19 @@ st.markdown(
     """
     <div class="hero">
       <h1>소수 나눗셈 탐험대</h1>
-      <p class="goal"><b>오늘의 학습 목표</b> · 그림과 생활 속 상황으로 소수 나눗셈의 뜻을 알고,
-      두 수에 같은 수를 곱해도 몫이 변하지 않는 원리를 찾아요.</p>
+      <p class="goal"><b>오늘의 학습 목표</b> · 그림과 생활 속 상황을 통해 소수 나눗셈의 뜻을 알아보고,
+      두 수에 같은 수를 곱해도 몫이 바뀌지 않는 이유를 찾아봐요.</p>
     </div>
     """,
     unsafe_allow_html=True,
 )
 
-st.markdown('<div class="section-label">출발 준비</div>', unsafe_allow_html=True)
+st.markdown('<div class="section-label">학습 안내</div>', unsafe_allow_html=True)
 with st.container(border=True):
     st.subheader("학습 안내")
     st.write(
-        "리본과 주스를 직접 나누어 보며 소수 나눗셈을 탐험해요. "
-        "숫자를 바꾸면 그림과 계산도 함께 바뀝니다. 마지막 미션까지 도전해 보세요!"
+        "리본을 똑같이 나누고 주스를 컵에 담으며 소수 나눗셈을 알아봐요. "
+        "수를 바꾸면 그림과 계산 결과도 함께 달라져요. 활동을 차례로 해 보고 마지막 미션에 도전해 보세요!"
     )
 
 st.markdown('<div class="section-label">첫 번째 활동</div>', unsafe_allow_html=True)
@@ -446,8 +450,8 @@ with st.container(border=True):
     st.subheader("소수점을 없애는 마법")
     st.markdown('<div class="equation">3.6 ÷ 0.6</div>', unsafe_allow_html=True)
     st.write(
-        "처음에는 3.6 나누기 0.6이에요. 두 수를 똑같이 바꾸면 나누는 수의 "
-        "소수점을 없애 자연수의 나눗셈으로 계산할 수 있어요."
+        "나누어지는 수와 나누는 수에 같은 수를 곱해도 몫은 바뀌지 않아요. "
+        "이 방법으로 3.6 ÷ 0.6을 자연수의 나눗셈으로 바꾸어 계산해 볼게요."
     )
     if "transform_multiplier" not in st.session_state:
         st.session_state.transform_multiplier = 10
@@ -470,7 +474,7 @@ with st.container(border=True):
     )
     svg_image(division_process_svg(multiplier, start_a, start_b))
     st.markdown(
-        f'<div class="step"><b>2. 두 수에 {multiplier}을(를) 곱해요</b><br>'
+        f'<div class="step"><b>2. 두 수에 각각 {multiplier}을 곱해요</b><br>'
         f'3.6 × {multiplier} = {decimal_text(changed_a)}, '
         f'0.6 × {multiplier} = {decimal_text(changed_b)}</div>',
         unsafe_allow_html=True,
@@ -486,8 +490,8 @@ with st.container(border=True):
     with compare_right:
         st.metric("바뀐 식의 몫", fraction_text(changed))
     st.success(
-        "두 수에 같은 수를 곱해도 나눗셈의 몫은 변하지 않아요. "
-        "그래서 3.6 나누기 0.6은 36 나누기 6으로 바꾸어 계산할 수 있고, 정답은 6이에요."
+        "두 수에 같은 수를 곱해도 나눗셈의 몫은 바뀌지 않아요. "
+        "따라서 3.6 ÷ 0.6은 36 ÷ 6으로 바꾸어 계산할 수 있고, 몫은 6이에요."
     )
     left_visual, right_visual = st.columns(2)
     with left_visual:
@@ -500,14 +504,14 @@ with st.container(border=True):
 st.markdown('<div class="section-label">탐험 미션</div>', unsafe_allow_html=True)
 with st.container(border=True):
     st.subheader("탐험 미션")
-    st.write("배운 내용을 직접 적용해 보세요. 틀려도 괜찮아요. 계산 방향 힌트를 확인해 다시 도전하세요!")
+    st.write("배운 내용을 미션에 적용해 보세요. 정답이 아니어도 괜찮아요. 힌트를 읽고 다시 풀어 보세요.")
     mission_data = [
         ("mission_1", "첫 번째 미션", "4.8 ÷ 2", Decimal("4.8"), Decimal("2"),
-         "4.8을 2개의 같은 양으로 똑같이 나누어 보세요."),
+         "4.8을 두 사람이 똑같이 나눈다고 생각해 보세요."),
         ("mission_2", "두 번째 미션", "5.4 ÷ 0.9", Decimal("5.4"), Decimal("0.9"),
-         "나누는 수 0.9에 10을 곱해 자연수로 바꾸어 보세요. 나누어지는 수도 똑같이 바꾸어요."),
+         "0.9에 10을 곱해 자연수로 바꿔 보세요. 나누어지는 수에도 같은 수를 곱해야 해요."),
         ("mission_3", "세 번째 미션", "7.2 ÷ 0.6", Decimal("7.2"), Decimal("0.6"),
-         "두 수에 10을 곱해 자연수의 나눗셈으로 바꾸어 보세요."),
+         "두 수에 각각 10을 곱해 자연수의 나눗셈으로 바꿔 보세요."),
     ]
     mission_columns = st.columns(3)
     for column, (key, title, equation, dividend, divisor, hint) in zip(
@@ -518,9 +522,9 @@ with st.container(border=True):
                 st.markdown(f"#### {title}")
                 st.markdown(f'<div class="equation">{equation}</div>', unsafe_allow_html=True)
                 answer_raw = st.text_input(
-                    "정답", placeholder="숫자를 입력하세요", key=f"{key}_answer"
+                    "정답", placeholder="답을 숫자로 입력해 보세요.", key=f"{key}_answer"
                 )
-                if st.button("미션 정답 확인", key=f"{key}_check", use_container_width=True):
+                if st.button("정답 확인", key=f"{key}_check", use_container_width=True):
                     try:
                         entered = parse_decimal(answer_raw, "정답")
                         correct = Fraction(entered) == exact_quotient(dividend, divisor)
@@ -534,7 +538,7 @@ with st.container(border=True):
                     if feedback[0] is None:
                         st.warning(feedback[2])
                     elif feedback[0]:
-                        st.success("미션 성공! 멋진 탐험가예요!")
+                        st.success("미션 성공! 잘 풀었어요.")
                         st.markdown(
                             '<div class="visual"><svg role="img" aria-label="축하 메달과 반짝이는 별" '
                             'viewBox="0 0 220 100" width="100%" style="max-width:230px;height:auto;display:block;margin:auto" '
@@ -557,27 +561,27 @@ with st.container(border=True):
     st.progress(completed / len(mission_data), text=f"미션 진행 상황: {completed} / 3 완료")
     if completed == len(mission_data):
         st.balloons()
-        st.success("최종 성공! 세 가지 미션을 모두 완료했어요. 소수 나눗셈 탐험을 해냈어요!")
+        st.success("축하해요! 세 가지 미션을 모두 해결했어요. 소수 나눗셈의 원리를 잘 이해했네요!")
 
 st.markdown('<div class="section-label">학습 정리</div>', unsafe_allow_html=True)
 with st.container(border=True):
     st.subheader("학습 정리")
     st.markdown(
         """
-        - 소수의 나눗셈은 양을 똑같이 나누거나 어떤 양 안에 다른 양이 몇 번 들어가는지 알아볼 때 사용한다.
-        - 소수로 나누는 경우 나누어지는 수와 나누는 수에 같은 수를 곱하면 자연수의 나눗셈으로 바꾸어 계산할 수 있다.
-        - 두 수에 같은 수를 곱해도 나눗셈의 몫은 변하지 않는다.
+        - 소수의 나눗셈은 양을 똑같이 나누거나, 어떤 양 안에 다른 양이 몇 번 들어가는지 알아볼 때 사용해요.
+        - 소수로 나눌 때는 나누어지는 수와 나누는 수에 같은 수를 곱해 자연수의 나눗셈으로 바꿔 계산할 수 있어요.
+        - 두 수에 같은 수를 곱해도 나눗셈의 몫은 바뀌지 않아요.
         """
     )
     st.markdown("#### 오늘 배운 내용 스스로 확인하기")
     reflection = st.radio(
-        "3.6 ÷ 0.6을 36 ÷ 6으로 바꿀 때 두 수에 무엇을 했나요?",
-        ["두 수에 각각 10을 곱했어요.", "나누어지는 수에만 10을 곱했어요.", "두 수를 더했어요."],
+        "3.6 ÷ 0.6을 36 ÷ 6으로 바꾸려면 두 수를 어떻게 해야 할까요?",
+        ["두 수에 각각 10을 곱해요.", "나누어지는 수에만 10을 곱해요.", "두 수를 더해요."],
         index=None,
         key="reflection",
     )
-    if reflection == "두 수에 각각 10을 곱했어요.":
-        st.success("맞아요! 두 수에 같은 수를 곱해도 몫은 변하지 않아요.")
+    if reflection == "두 수에 각각 10을 곱해요.":
+        st.success("맞아요! 두 수에 같은 수를 곱해도 몫은 바뀌지 않아요.")
     elif reflection:
-        st.info("두 수에 같은 수를 곱해야 몫이 변하지 않아요. 계산 원리를 다시 떠올려 보세요.")
+        st.info("두 수 모두에 같은 수를 곱해야 몫이 바뀌지 않아요. 계산 원리를 다시 생각해 보세요.")
 

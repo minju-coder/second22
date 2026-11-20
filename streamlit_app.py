@@ -154,7 +154,9 @@ def show_interactive_activity(
         try:
             dividend = parse_decimal(dividend_raw, dividend_label)
             divisor = parse_decimal(divisor_raw, divisor_label)
-            if dividend < 0 or divisor <= 0:
+            if divisor == 0:
+                raise ValueError("0으로 나눌 수 없어요. 나누는 수를 확인해 주세요.")
+            if dividend < 0 or divisor < 0:
                 raise ValueError("양수로 입력해 주세요.")
             answer = exact_quotient(dividend, divisor)
 

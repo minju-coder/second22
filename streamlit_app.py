@@ -10,69 +10,8 @@ st.set_page_config(
     layout="wide",
 )
 
-st.markdown(
-    """
-    <style>
-    html, body, [class*="st-"], input, textarea, button {
-        font-family: "Noto Sans KR", "Malgun Gothic", "Apple SD Gothic Neo",
-                     "Nanum Gothic", sans-serif;
-    }
-    .stApp { background: #f5f9ff; }
-    .block-container { max-width: 1080px; padding-top: 2rem; }
-    .hero {
-        padding: 1.7rem 2rem; border-radius: 22px;
-        background: linear-gradient(120deg, #dff4ff, #f1eaff);
-        border: 1px solid #d6e8ff; margin-bottom: 1rem;
-    }
-    .hero-label {
-        display: inline-block; margin-bottom: .45rem; padding: .2rem .65rem;
-        color: #315887; background: #fff; border-radius: 999px;
-        font-size: .85rem; font-weight: 700;
-    }
-    .hero h1 { color: #23395d; margin: 0 0 .45rem; }
-    .hero p { color: #405675; margin: 0; font-size: 1.05rem; }
-    .visual-label { color: #405675; font-weight: 700; margin: .6rem 0 .3rem; }
-    .ribbon { display: flex; gap: 5px; margin: .5rem 0 1rem; }
-    .ribbon-part {
-        flex: 1; min-width: 0; padding: .8rem .2rem; text-align: center;
-        color: #23395d; background: #ffe08a; border: 2px solid #fff;
-        border-radius: 9px; font-size: .86rem; font-weight: 700;
-    }
-    .juice-track {
-        height: 25px; background: #e7edf5; border-radius: 14px;
-        overflow: hidden; border: 1px solid #d8e1ed;
-    }
-    .juice-fill {
-        height: 100%; background: linear-gradient(90deg, #ffbd59, #ff8c69);
-        border-radius: 14px;
-    }
-    .cups { display: flex; flex-wrap: wrap; gap: 8px; margin: .8rem 0; }
-    .cup {
-        border: 2px solid #78a9e8; border-top: 0; border-radius: 4px 4px 12px 12px;
-        width: 58px; height: 48px; display: flex; align-items: end;
-        justify-content: center; padding-bottom: 5px; color: #234;
-        background: linear-gradient(to top, #ffbd59 0 55%, #fff 55% 100%);
-        font-size: .76rem; font-weight: 700;
-    }
-    .principle {
-        padding: 1rem 1.2rem; background: #e9f8ed; border-left: 5px solid #58ae72;
-        border-radius: 10px; color: #294d35;
-    }
-    </style>
-    """,
-    unsafe_allow_html=True,
-)
-
-st.markdown(
-    """
-    <div class="hero">
-      <span class="hero-label">수학 탐험 학습</span>
-      <h1>소수 나눗셈 탐험대</h1>
-      <p>생활 속 장면을 살펴보고, 그림으로 나누어 보고, 계산 원리를 직접 찾아보세요!</p>
-    </div>
-    """,
-    unsafe_allow_html=True,
-)
+st.title("소수 나눗셈 탐험대")
+st.caption("생활 속 장면을 살펴보고, 나누어 보고, 계산 원리를 직접 찾아보세요.")
 
 
 def parse_decimal(raw_value: str, label: str) -> Decimal:
@@ -174,19 +113,18 @@ def show_interactive_activity(
                 if divisor != divisor.to_integral_value():
                     raise ValueError("리본을 나눌 사람 수는 자연수로 입력해 주세요.")
                 part_count = int(divisor)
-                st.markdown(
-                    f'<div class="visual-label">리본 {decimal_text(dividend)}m를 '
-                    f'{part_count}명이 똑같이 나누어요.</div>',
-                    unsafe_allow_html=True,
+                st.write(
+                    f"리본 {decimal_text(dividend)}m를 "
+                    f"{part_count}명이 똑같이 나누어요."
                 )
                 if part_count <= 24:
-                    parts = "".join(
-                        f'<div class="ribbon-part">{format_fraction(answer)}m</div>'
-                        for _ in range(part_count)
-                    )
-                    st.markdown(
-                        f'<div class="ribbon">{parts}</div>', unsafe_allow_html=True
-                    )
+                    part_columns = st.columns(min(part_count, 6))
+                    for part_index in range(part_count):
+                        with part_columns[part_index % len(part_columns)]:
+                            st.metric(
+                                label=f"{part_index + 1}번째 사람",
+                                value=f"{format_fraction(answer)}m",
+                            )
                 else:
                     st.info(
                         f"리본을 {part_count}조각으로 나눕니다. "
@@ -196,21 +134,22 @@ def show_interactive_activity(
                 common_scale = max(dividend, divisor)
                 total_width = 100.0 if common_scale == 0 else float(dividend / common_scale * 100)
                 cup_width = 0.0 if common_scale == 0 else float(divisor / common_scale * 100)
-                st.markdown(
-                    f'<div class="visual-label">전체 주스 {decimal_text(dividend)}L</div>'
-                    f'<div class="juice-track"><div class="juice-fill" '
-                    f'style="width:{total_width:.2f}%"></div></div>'
-                    f'<div class="visual-label">컵 하나에 {decimal_text(divisor)}L</div>'
-                    f'<div class="juice-track"><div class="juice-fill" '
-                    f'style="width:{cup_width:.2f}%"></div></div>',
-                    unsafe_allow_html=True,
+                st.progress(
+                    total_width / 100,
+                    text=f"전체 주스: {decimal_text(dividend)}L",
+                )
+                st.progress(
+                    cup_width / 100,
+                    text=f"컵 하나에 담는 양: {decimal_text(divisor)}L",
                 )
                 if answer.denominator == 1 and 0 < answer.numerator <= 24:
-                    cups = "".join(
-                        f'<div class="cup"><span>{decimal_text(divisor)}L</span></div>'
-                        for _ in range(answer.numerator)
-                    )
-                    st.markdown(f'<div class="cups">{cups}</div>', unsafe_allow_html=True)
+                    cup_columns = st.columns(min(int(answer.numerator), 6))
+                    for cup_index in range(int(answer.numerator)):
+                        with cup_columns[cup_index % len(cup_columns)]:
+                            st.metric(
+                                label=f"{cup_index + 1}번 컵",
+                                value=f"{decimal_text(divisor)}L",
+                            )
                     st.caption(f"컵 {answer.numerator}개에 똑같이 담았어요.")
                 else:
                     st.caption(
@@ -299,12 +238,10 @@ with st.container(border=True):
         f"3. 바뀐 식: **{decimal_text(converted_dividend)} ÷ "
         f"{decimal_text(converted_divisor)} = {format_fraction(converted_answer)}**"
     )
-    st.markdown(
-        '<div class="principle"><b>발견한 원리</b><br>'
+    st.info(
+        "**발견한 원리**\n\n"
         "나누어지는 수와 나누는 수에 같은 수를 곱해도 몫은 변하지 않아요. "
         "그래서 소수로 나누는 식을 자연수의 나눗셈으로 바꾸어 계산할 수 있어요!"
-        "</div>",
-        unsafe_allow_html=True,
     )
     st.caption(
         f"비교해 보세요: 처음 몫 {format_fraction(original_answer)} "

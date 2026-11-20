@@ -13,7 +13,7 @@ st.set_page_config(
 st.markdown(
     """
     <style>
-    html, body, [class*="st-"] {
+    html, body, [class*="st-"], input, textarea, button {
         font-family: "Noto Sans KR", "Malgun Gothic", "Apple SD Gothic Neo",
                      "Nanum Gothic", sans-serif;
     }

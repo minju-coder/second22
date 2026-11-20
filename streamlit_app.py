@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from decimal import Decimal, InvalidOperation, localcontext
 from fractions import Fraction
 
@@ -6,19 +7,27 @@ import streamlit as st
 
 st.set_page_config(
     page_title="소수 나눗셈 탐험대",
-    page_icon="🧭",
     layout="wide",
 )
 
 st.markdown(
     """
     <style>
+    html, body, [class*="st-"] {
+        font-family: "Noto Sans KR", "Malgun Gothic", "Apple SD Gothic Neo",
+                     "Nanum Gothic", sans-serif;
+    }
     .stApp { background: #f5f9ff; }
     .block-container { max-width: 1080px; padding-top: 2rem; }
     .hero {
         padding: 1.7rem 2rem; border-radius: 22px;
         background: linear-gradient(120deg, #dff4ff, #f1eaff);
         border: 1px solid #d6e8ff; margin-bottom: 1rem;
+    }
+    .hero-label {
+        display: inline-block; margin-bottom: .45rem; padding: .2rem .65rem;
+        color: #315887; background: #fff; border-radius: 999px;
+        font-size: .85rem; font-weight: 700;
     }
     .hero h1 { color: #23395d; margin: 0 0 .45rem; }
     .hero p { color: #405675; margin: 0; font-size: 1.05rem; }
@@ -40,7 +49,7 @@ st.markdown(
     .cups { display: flex; flex-wrap: wrap; gap: 8px; margin: .8rem 0; }
     .cup {
         border: 2px solid #78a9e8; border-top: 0; border-radius: 4px 4px 12px 12px;
-        width: 58px; min-height: 48px; display: flex; align-items: end;
+        width: 58px; height: 48px; display: flex; align-items: end;
         justify-content: center; padding-bottom: 5px; color: #234;
         background: linear-gradient(to top, #ffbd59 0 55%, #fff 55% 100%);
         font-size: .76rem; font-weight: 700;
@@ -57,7 +66,8 @@ st.markdown(
 st.markdown(
     """
     <div class="hero">
-      <h1>🧭 소수 나눗셈 탐험대</h1>
+      <span class="hero-label">수학 탐험 학습</span>
+      <h1>소수 나눗셈 탐험대</h1>
       <p>생활 속 장면을 살펴보고, 그림으로 나누어 보고, 계산 원리를 직접 찾아보세요!</p>
     </div>
     """,
@@ -122,7 +132,7 @@ def check_answer(raw_answer: str, answer: Fraction, label: str) -> tuple[bool | 
     except ValueError as error:
         return None, str(error)
     if Fraction(entered) == answer:
-        return True, "정답이에요! 멋진 탐험가네요 🎉"
+        return True, "정답이에요! 멋진 탐험가네요."
     return False, "조금 달라요. 그림과 나눗셈식을 다시 살펴보고 한 번 더 생각해 보세요."
 
 
@@ -165,7 +175,7 @@ def show_interactive_activity(
                     raise ValueError("리본을 나눌 사람 수는 자연수로 입력해 주세요.")
                 part_count = int(divisor)
                 st.markdown(
-                    f'<div class="visual-label">🎀 리본 {decimal_text(dividend)}m를 '
+                    f'<div class="visual-label">리본 {decimal_text(dividend)}m를 '
                     f'{part_count}명이 똑같이 나누어요.</div>',
                     unsafe_allow_html=True,
                 )
@@ -187,17 +197,17 @@ def show_interactive_activity(
                 total_width = 100.0 if common_scale == 0 else float(dividend / common_scale * 100)
                 cup_width = 0.0 if common_scale == 0 else float(divisor / common_scale * 100)
                 st.markdown(
-                    f'<div class="visual-label">🧃 전체 주스 {decimal_text(dividend)}L</div>'
+                    f'<div class="visual-label">전체 주스 {decimal_text(dividend)}L</div>'
                     f'<div class="juice-track"><div class="juice-fill" '
                     f'style="width:{total_width:.2f}%"></div></div>'
-                    f'<div class="visual-label">🥤 컵 하나에 {decimal_text(divisor)}L</div>'
+                    f'<div class="visual-label">컵 하나에 {decimal_text(divisor)}L</div>'
                     f'<div class="juice-track"><div class="juice-fill" '
                     f'style="width:{cup_width:.2f}%"></div></div>',
                     unsafe_allow_html=True,
                 )
                 if answer.denominator == 1 and 0 < answer.numerator <= 24:
                     cups = "".join(
-                        f'<div class="cup">🥤 {decimal_text(divisor)}L</div>'
+                        f'<div class="cup"><span>{decimal_text(divisor)}L</span></div>'
                         for _ in range(answer.numerator)
                     )
                     st.markdown(f'<div class="cups">{cups}</div>', unsafe_allow_html=True)
@@ -239,7 +249,7 @@ def show_interactive_activity(
 
 show_interactive_activity(
     key="ribbon",
-    title="🎀 활동 1. 소수 ÷ 자연수",
+    title="활동 1. 소수 ÷ 자연수",
     situation="리본 3.6m를 4명이 똑같이 나누어 가지려고 해요. 한 사람은 몇 m씩 가질까요?",
     dividend_label="나누어지는 수 (리본 전체, m)",
     divisor_label="나누는 수 (사람 수)",
@@ -251,7 +261,7 @@ show_interactive_activity(
 
 show_interactive_activity(
     key="juice",
-    title="🧃 활동 2. 소수 ÷ 소수",
+    title="활동 2. 소수 ÷ 소수",
     situation="주스 3.6L를 한 컵에 0.6L씩 담으려고 해요. 몇 컵에 담을 수 있을까요?",
     dividend_label="전체 주스의 양 (L)",
     divisor_label="컵 하나에 담는 양 (L)",
@@ -262,7 +272,7 @@ show_interactive_activity(
 )
 
 with st.container(border=True):
-    st.subheader("🔍 계산 원리 탐험: 3.6 ÷ 0.6")
+    st.subheader("계산 원리 탐험: 3.6 ÷ 0.6")
     st.write("나누는 수를 자연수로 바꾸려면, 나누어지는 수도 똑같이 바꾸면 어떻게 될까요?")
     if "transform_multiplier" not in st.session_state:
         st.session_state.transform_multiplier = 10
@@ -310,7 +320,7 @@ missions = [
      "두 수에 10을 곱해 자연수의 나눗셈으로 바꾸어 보세요."),
 ]
 
-st.subheader("🏅 탐구 미션")
+st.subheader("탐구 미션")
 st.write("배운 원리를 써서 미션을 해결해 보세요!")
 mission_columns = st.columns(3)
 for column, (key, title, equation, dividend, divisor, hint) in zip(
@@ -329,7 +339,7 @@ for column, (key, title, equation, dividend, divisor, hint) in zip(
                     is_correct = Fraction(entered) == exact_quotient(dividend, divisor)
                     feedback = (
                         is_correct,
-                        "미션 성공! 다음 탐험으로 출발해요 🚀" if is_correct else hint,
+                        "미션 성공! 다음 탐험으로 출발해요." if is_correct else hint,
                     )
                 except ValueError as error:
                     feedback = (None, str(error))
@@ -345,7 +355,7 @@ for column, (key, title, equation, dividend, divisor, hint) in zip(
                     st.info(message)
 
 with st.container(border=True):
-    st.subheader("📌 오늘의 탐험 정리")
+    st.subheader("오늘의 탐험 정리")
     st.markdown(
         """
         - 소수의 나눗셈은 생활에서 **양을 똑같이 나누거나**, 어떤 양이 **몇 번 들어가는지** 알아볼 때 사용해요.

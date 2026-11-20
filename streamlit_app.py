@@ -55,7 +55,7 @@ st.markdown(
 def parse_decimal(raw_value: str, label: str) -> Decimal:
     value = raw_value.strip()
     if not value:
-        raise ValueError(f"{label}을 입력해 주세요.")
+        raise ValueError(f"‘{label}’ 입력란을 채워 주세요.")
     if len(value) > 40:
         raise ValueError("입력값은 40자 이내로 써 주세요.")
     try:
@@ -363,9 +363,9 @@ def show_activity(
                         if dividend == Decimal("3.6") and divisor == Decimal("4"):
                             st.markdown(
                                 "**3.6 나누기 4는 36 나누기 4를 계산한 다음 "
-                                "10분의 1로 바꾸는 것과 같다.**"
+                                "10분의 1로 바꾸는 것과 같아요.**"
                             )
-                            st.markdown("**따라서 정답은 0.9미터이다.**")
+                            st.markdown("**따라서 정답은 0.9미터예요.**")
                         st.markdown(
                             f"계산: {decimal_text(dividend)} ÷ {decimal_text(divisor)} "
                             f"= {decimal_text(scaled_dividend)} ÷ "
@@ -381,9 +381,9 @@ def show_activity(
                         if dividend == Decimal("3.6") and divisor == Decimal("0.6"):
                             st.markdown(
                                 "**3.6 나누기 0.6은 두 수에 똑같이 10을 곱하여 "
-                                "36 나누기 6으로 바꿀 수 있다.**"
+                                "36 나누기 6으로 바꿀 수 있어요.**"
                             )
-                            st.markdown("**따라서 정답은 6컵이다.**")
+                            st.markdown("**따라서 정답은 6컵이에요.**")
                         else:
                             st.markdown(
                                 f"두 수에 똑같이 {common_multiplier}을 곱해 "

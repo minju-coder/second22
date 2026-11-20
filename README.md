@@ -4,7 +4,7 @@
 
 ## 설치 및 실행
 
-Python 3.9 이상에서 프로젝트 폴더로 이동해 다음 명령을 실행합니다.
+Python 3.10 이상에서 프로젝트 폴더로 이동해 다음 명령을 실행합니다.
 
 ```bash
 python -m pip install -r requirements.txt

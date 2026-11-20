@@ -15,7 +15,6 @@ st.set_page_config(
 st.markdown(
     """
     <style>
-    @import url('https://fonts.googleapis.com/css2?family=Gowun+Dodum&family=Jua&display=swap');
     html, body, [class*="css"] { font-family: 'Gowun Dodum', sans-serif; }
     h1, h2, h3 { font-family: 'Jua', sans-serif !important; color: #29365f; }
     .hero {
@@ -325,7 +324,9 @@ def show_activity(
                     scale_places = max(0, -dividend.normalize().as_tuple().exponent)
                     multiplier = 10 ** scale_places
                     scaled_dividend = dividend * multiplier
-                    scaled_divisor = divisor * multiplier
+                    scaled_divisor = (
+                        divisor if kind == "ribbon" else divisor * multiplier
+                    )
                     quotient_scaled = exact_quotient(scaled_dividend, scaled_divisor)
                     if kind == "ribbon":
                         if multiplier == 10:
@@ -337,7 +338,7 @@ def show_activity(
                         st.markdown(
                             f"계산: {decimal_text(dividend)} ÷ {decimal_text(divisor)} "
                             f"= {decimal_text(scaled_dividend)} ÷ "
-                            f"{decimal_text(scaled_divisor)} "
+                            f"{decimal_text(divisor)} "
                             f"= {fraction_text(quotient_scaled)}"
                             + (f" ÷ {multiplier}" if multiplier > 1 else "")
                             + f" = **{fraction_text(answer)}m**"
@@ -501,8 +502,16 @@ with st.container(border=True):
                     elif feedback[0]:
                         st.success("미션 성공! 멋진 탐험가예요!")
                         st.markdown(
-                            '<div style="text-align:center;font-size:2.4rem" '
-                            'role="img" aria-label="축하 그림">🎉🏅🎊</div>',
+                            '<div class="visual"><svg role="img" aria-label="축하 메달과 반짝이는 별" '
+                            'viewBox="0 0 220 100" width="100%" style="max-width:230px;height:auto;display:block;margin:auto" '
+                            'xmlns="http://www.w3.org/2000/svg"><path d="M75 5 L95 5 L100 42 L85 53 L70 42Z" '
+                            'fill="#ff91a4"/><path d="M125 5 L145 5 L150 42 L135 53 L120 42Z" fill="#83c8ed"/>'
+                            '<circle cx="110" cy="58" r="32" fill="#ffd66e" stroke="#d79c32" stroke-width="4"/>'
+                            '<path d="M110 35 L117 50 L134 52 L122 64 L125 81 L110 73 L95 81 L98 64 L86 52 L103 50Z" '
+                            'fill="#fff8d8" stroke="#d79c32" stroke-width="2"/>'
+                            '<path d="M35 39 L39 49 L50 50 L42 58 L44 69 L35 64 L26 69 L28 58 L20 50 L31 49Z" '
+                            'fill="#b49af2"/><path d="M185 24 L189 34 L200 35 L192 43 L194 54 L185 49 L176 54 L178 43 L170 35 L181 34Z" '
+                            'fill="#b49af2"/></svg></div>',
                             unsafe_allow_html=True,
                         )
                     else:

@@ -15,14 +15,22 @@ st.set_page_config(
 st.markdown(
     """
     <style>
-    html, body, [class*="css"] { font-family: 'Gowun Dodum', sans-serif; }
-    h1, h2, h3 { font-family: 'Jua', sans-serif !important; color: #29365f; }
+    html, body, [class*="css"] {
+        font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+    }
+    h1, h2, h3 {
+        font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif !important;
+        color: #29365f;
+    }
     .hero {
         padding: 2rem 2.2rem; border-radius: 26px; margin: .4rem 0 1.4rem;
         background: linear-gradient(120deg, #fff2cc 0%, #ffe1e8 52%, #e2f4ff 100%);
         border: 1px solid #f3dfe1;
     }
-    .hero h1 { font-size: clamp(2.2rem, 5vw, 3.5rem); margin: 0 0 .4rem; }
+    .hero h1 {
+        font-size: clamp(1.2rem, 5.2vw, 3.5rem); line-height: 1.25;
+        white-space: nowrap; letter-spacing: -.04em; margin: 0 0 .4rem;
+    }
     .goal { color: #44506e; font-size: 1.12rem; margin-bottom: 0; }
     .section-label {
         display: inline-block; padding: .35rem .85rem; border-radius: 999px;
